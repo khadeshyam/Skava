@@ -48,13 +48,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v2
-        with:
-          sdk-version: "31"
-          ndk-version: 23.1.7779620
-          java-version: "11"
-
       - name: Cache yarn dependencies
         uses: actions/cache@v3
         with:
