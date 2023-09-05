@@ -26,6 +26,17 @@ jobs:
           distribution: adopt
           java-version: 11
 
+      - name: Restore cached gradle dependencies 
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+  
+
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
 
@@ -42,7 +53,14 @@ jobs:
           echo "MYAPP_UPLOAD_STORE_PASSWORD=$MYAPP_UPLOAD_STORE_PASSWORD" >> android/gradle.properties
           echo "MYAPP_UPLOAD_KEY_PASSWORD=$MYAPP_UPLOAD_KEY_PASSWORD" >> android/gradle.properties
           cat android/gradle.properties
-
+      
+      - name: Restore cached yarn dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/yarn
+          key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
+          restore-keys: ${{ runner.os }}-yarn-
+  
       - name: Install yarn dependencies
         run: |
           yarn --frozen-lockfile
@@ -61,23 +79,6 @@ jobs:
       - name: Build the App
         run: |
           yarn run android:build
-
-      - name: Cache Gradle dependencies
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-
-      - name: Cache yarn dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/yarn
-          key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
-          restore-keys: ${{ runner.os }}-yarn-
 
       - name: Upload APK
         uses: actions/upload-artifact@v3
